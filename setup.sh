@@ -17,7 +17,7 @@ declare -A PROFILES=(
     [armv8.0]="cortex-a53|armv8-a|arm64v8/ubuntu:22.04|ARMv8.0 minimal"
     [armv8.2]="neoverse-n1|armv8.2-a|arm64v8/ubuntu:22.04|ARMv8.2 (Kunpeng 920 class)"
     [armv8.4]="neoverse-v1|armv8.4-a|arm64v8/ubuntu:22.04|ARMv8.4 (Kunpeng 930 target)"
-    [armv9.0]="neoverse-v2|armv9-a|arm64v8/ubuntu:24.04|ARMv9.0 with SVE2"
+    [armv9.0]="neoverse-v2|armv8.5-a|arm64v8/ubuntu:24.04|ARMv9.0 with SVE2 (use armv8.5-a +sve2 on GCC)"
     [thunderx2]="thunderx2t99|armv8.1-a|arm64v8/ubuntu:22.04|Cavium ThunderX2 server"
     [armhf]="cortex-a7|armv7-a|arm32v7/ubuntu:22.04|ARM32 hard-float"
     [armv7]="cortex-a15|armv7-a|arm32v7/debian:bullseye|ARM32 generic"
@@ -291,7 +291,13 @@ ENTRYPOINT
     echo "  QEMU CPU:   ${cpu}"
     echo "  GCC march:  ${march_flags}"
     echo "  Base image: ${base_image}"
-    docker build -t "${IMAGE_NAME}" -f "${df_path}" "${SCRIPT_DIR}"
+
+    local platform
+    case "${PROFILE}" in
+        armhf|armv7) platform="linux/arm/v7" ;;
+        *)           platform="linux/arm64" ;;
+    esac
+    docker buildx build --platform "${platform}" --load -t "${IMAGE_NAME}" -f "${df_path}" "${SCRIPT_DIR}"
     echo "[OK] Image built: ${IMAGE_NAME}"
 }
 

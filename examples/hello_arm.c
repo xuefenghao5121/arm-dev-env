@@ -51,7 +51,7 @@ int main() {
     printf("SVE2:    no\n");
 #endif
 
-#if defined(__ARM_FEATURE_LSE)
+#if defined(__ARM_FEATURE_ATOMICS)
     printf("LSE:     yes (atomic instructions)\n");
 #else
     printf("LSE:     no\n");
